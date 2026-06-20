@@ -1619,7 +1619,9 @@ function showToast(message) {
     }, 2000);
 }
 
-// ===== Service Worker =====
+// ===== Service Worker & PWA Install =====
+let deferredPrompt;
+
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1628,4 +1630,35 @@ function registerServiceWorker() {
                 .catch(e => console.log('SW failed:', e));
         });
     }
+
+    // Handle PWA Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+        // Update UI to notify the user they can add to home screen
+        const installBtn = document.getElementById('menu-install-app');
+        if (installBtn) {
+            installBtn.classList.remove('hidden');
+            installBtn.addEventListener('click', async () => {
+                // Show the prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // We've used the prompt, and can't use it again, throw it away
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            });
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        // Hide the app-provided install promotion
+        const installBtn = document.getElementById('menu-install-app');
+        if (installBtn) installBtn.classList.add('hidden');
+        deferredPrompt = null;
+        console.log('PWA was installed');
+    });
 }
