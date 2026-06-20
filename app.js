@@ -1401,9 +1401,26 @@ async function saveNewStory() {
                 console.log('Could not get duration, using default');
             }
             
-            // Upload to Firebase Storage
+            // Upload to Firebase Storage with Progress
             const audioRef = ref(storage, 'audio/' + storyId + '-' + Date.now());
-            await uploadBytesResumable(audioRef, state.pendingAudio);
+            const uploadTask = uploadBytesResumable(audioRef, state.pendingAudio);
+            
+            await new Promise((resolve, reject) => {
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        submitBtn.querySelector('span').textContent = `Mengunggah Audio... ${Math.round(progress)}%`;
+                    }, 
+                    (error) => {
+                        console.error("Upload error details:", error);
+                        reject(error);
+                    }, 
+                    () => {
+                        resolve();
+                    }
+                );
+            });
+            
             audioUrl = await getDownloadURL(audioRef);
         }
 
