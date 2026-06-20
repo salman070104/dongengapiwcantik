@@ -1637,9 +1637,21 @@ let deferredPrompt;
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(r => console.log('SW registered:', r.scope))
+            navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+                .then(reg => {
+                    console.log('SW registered:', reg.scope);
+                    // Cek update SW setiap 30 detik
+                    setInterval(() => reg.update(), 30000);
+                })
                 .catch(e => console.log('SW failed:', e));
+        });
+
+        // Ketika SW baru aktif, otomatis reload halaman agar user dapat versi terbaru
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'SW_UPDATED') {
+                console.log('SW updated, reloading page...');
+                window.location.reload();
+            }
         });
     }
 
