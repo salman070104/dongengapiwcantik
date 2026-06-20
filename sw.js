@@ -1,5 +1,5 @@
 // Dongeng Ceria - Service Worker
-const CACHE_NAME = 'dongeng-ceria-v2';
+const CACHE_NAME = 'dongeng-ceria-v3';
 const urlsToCache = [
     '/',
     '/index.html',
