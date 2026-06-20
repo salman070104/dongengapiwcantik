@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Dongeng Ceria - Teman Tidur Si Kecil. Kumpulan dongeng anak pengantar tidur dengan cerita-cerita menarik dan menyenangkan.">
+    <meta name="theme-color" content="#4a1a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dongeng Ceria">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Dongeng Ceria - Teman Tidur Si Kecil</title>
+</head>
+<body>
+    <div id="app" class="app-container">
+
+        <!-- ======================== -->
+        <!-- PAGE: BERANDA (Home)     -->
+        <!-- ======================== -->
+        <div class="page active" id="page-beranda">
+            <!-- Hero Section -->
+            <section id="hero-section" class="hero-section">
+                <div class="hero-bg">
+                    <div class="stars-container" id="stars-container"></div>
+                    <div class="moon">
+                        <svg viewBox="0 0 80 80" width="60" height="60">
+                            <path d="M40 5C25 5 13 17 13 32c0 15 12 27 27 27 5 0 9.5-1.3 13.5-3.6C48 58 42 62 35 62 19.5 62 7 49.5 7 34S19.5 6 35 6c2 0 3.5.2 5 .5V5z" fill="#FFE066"/>
+                            <circle cx="25" cy="25" r="2" fill="#FFD700" opacity="0.5"/>
+                            <circle cx="35" cy="20" r="1.5" fill="#FFD700" opacity="0.4"/>
+                        </svg>
+                    </div>
+                    <button id="settings-btn" class="settings-btn" aria-label="Pengaturan">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
+                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="hero-content">
+                    <img src="images/hero-characters.png" alt="Karakter Dongeng Ceria" class="hero-image" id="hero-image">
+                    <h1 class="hero-title">
+                        <span class="title-dongeng">Dongeng</span>
+                        <span class="title-ceria">Ceria</span>
+                        <span class="title-sparkle">✨</span>
+                    </h1>
+                    <div class="hero-subtitle-badge">
+                        <span>Teman Tidur Si Kecil</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Player Controls -->
+            <section id="player-section" class="player-section">
+                <div class="player-card">
+                    <div class="player-action" id="putar-dongeng-action">
+                        <div class="player-icon-wrapper star-icon">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFD700">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <span class="player-label">Putar Dongeng</span>
+                        <span class="player-sublabel">Dengarkan sekarang</span>
+                    </div>
+                    <button id="play-btn" class="play-btn" aria-label="Putar">
+                        <div class="play-btn-inner">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div class="music-note note-1">♪</div>
+                        <div class="music-note note-2">♫</div>
+                    </button>
+                    <div class="player-action" id="timer-action">
+                        <div class="player-icon-wrapper cloud-icon">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="#a78bfa">
+                                <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                            </svg>
+                            <svg class="clock-icon" viewBox="0 0 24 24" width="16" height="16" fill="white">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <span class="player-label">Atur Timer</span>
+                        <span class="player-sublabel">30 menit</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Story List Section -->
+            <section id="story-section" class="story-section">
+                <div class="section-header">
+                    <div class="section-title-group">
+                        <span class="section-icon">📖</span>
+                        <h2 class="section-title">Pilih Dongeng</h2>
+                    </div>
+                    <div class="section-actions">
+                        <button id="add-story-btn" class="icon-btn" aria-label="Tambah Dongeng">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#7c3aed">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                        </button>
+                        <button id="see-all-btn" class="icon-btn" aria-label="Lihat Semua">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="#7c3aed">
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="story-list" id="story-list">
+                    <!-- Stories will be rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Recently Played -->
+            <section class="story-section" style="padding-top: 8px;">
+                <div class="section-header">
+                    <div class="section-title-group">
+                        <span class="section-icon">🕐</span>
+                        <h2 class="section-title">Baru Didengar</h2>
+                    </div>
+                </div>
+                <div class="recent-scroll" id="recent-scroll">
+                    <!-- Rendered by JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- ======================== -->
+        <!-- PAGE: DONGENG (Library)  -->
+        <!-- ======================== -->
+        <div class="page" id="page-dongeng">
+            <header class="page-header">
+                <h1 class="page-header-title">Dongeng</h1>
+                <div class="search-box" id="search-box">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af">
+                        <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Cari dongeng..." autocomplete="off">
+                </div>
+            </header>
+
+            <!-- Category Chips -->
+            <div class="category-chips" id="category-chips">
+                <button class="chip active" data-category="semua">Semua</button>
+                <button class="chip" data-category="populer">🔥 Populer</button>
+                <button class="chip" data-category="baru">✨ Baru</button>
+                <button class="chip" data-category="mudah">🟢 Mudah</button>
+                <button class="chip" data-category="sedang">🟡 Sedang</button>
+                <button class="chip" data-category="pengantar-tidur">🌙 Pengantar Tidur</button>
+                <button class="chip" data-category="petualangan">🗺️ Petualangan</button>
+            </div>
+
+            <!-- Full Story Grid -->
+            <div class="story-grid" id="story-grid">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ======================== -->
+        <!-- PAGE: FAVORIT            -->
+        <!-- ======================== -->
+        <div class="page" id="page-favorit">
+            <header class="page-header">
+                <h1 class="page-header-title">Favorit</h1>
+            </header>
+            <div class="favorit-content" id="favorit-content">
+                <!-- Empty state or favorite list rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ======================== -->
+        <!-- PAGE: PROFIL             -->
+        <!-- ======================== -->
+        <div class="page" id="page-profil">
+            <header class="page-header">
+                <h1 class="page-header-title">Profil</h1>
+            </header>
+            <div class="profil-content">
+                <div class="profil-avatar" id="profil-avatar">
+                    <div class="avatar-circle" id="avatar-circle-btn" style="cursor: pointer; position: relative;">
+                        <!-- Hidden file input for avatar -->
+                        <input type="file" id="profil-avatar-input" accept="image/*" hidden>
+                        <img id="profil-avatar-img" src="" alt="Profil" class="hidden" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        <svg id="profil-avatar-icon" viewBox="0 0 24 24" width="48" height="48" fill="white">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <div class="avatar-edit-overlay">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg>
+                        </div>
+                    </div>
+                    <div class="profil-name-container" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px;">
+                        <h2 class="profil-name" id="profil-name-display" style="margin: 0;">Si Kecil</h2>
+                        <button id="edit-name-btn" aria-label="Edit Nama" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                    </div>
+                    <p class="profil-subtitle">Pecinta Dongeng ✨</p>
+                </div>
+                <div class="profil-stats" id="profil-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-played">0</span>
+                        <span class="stat-label">Didengar</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-favorites">0</span>
+                        <span class="stat-label">Favorit</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-time">0m</span>
+                        <span class="stat-label">Waktu</span>
+                    </div>
+                </div>
+                <div class="profil-menu">
+                    <button class="menu-item" id="menu-notif">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                        <span>Notifikasi</span>
+                        <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    </button>
+                    <button class="menu-item" id="menu-timer-settings">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <span>Pengaturan Timer</span>
+                        <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    </button>
+                    <button class="menu-item" id="menu-theme">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                        </svg>
+                        <span>Tema Tampilan</span>
+                        <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    </button>
+                    <button class="menu-item" id="menu-about">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+                        <span>Tentang Aplikasi</span>
+                        <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== -->
+        <!-- MINI PLAYER (Spotify)    -->
+        <!-- ======================== -->
+        <div class="mini-player hidden" id="mini-player">
+            <div class="mini-player-progress" id="mini-player-progress"></div>
+            <div class="mini-player-content">
+                <img class="mini-player-thumb" id="mini-player-thumb" src="" alt="">
+                <div class="mini-player-info">
+                    <span class="mini-player-title" id="mini-player-title">Tidak ada dongeng</span>
+                    <span class="mini-player-subtitle" id="mini-player-subtitle">Pilih dongeng untuk mulai</span>
+                </div>
+                <div class="mini-player-controls">
+                    <button class="mini-player-btn" id="mini-prev-btn" aria-label="Sebelumnya">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="mini-player-btn mini-play-btn" id="mini-play-btn" aria-label="Putar/Jeda">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="white" id="mini-play-icon">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                    <button class="mini-player-btn" id="mini-next-btn" aria-label="Berikutnya">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== -->
+        <!-- FULL PLAYER (Overlay)    -->
+        <!-- ======================== -->
+        <div class="full-player hidden" id="full-player">
+            <div class="full-player-bg" id="full-player-bg"></div>
+            <div class="full-player-inner">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: absolute; top: 20px; left: 0; padding: 0 20px; z-index: 10;">
+                    <button class="full-player-close" id="full-player-close" aria-label="Tutup" style="position: relative; top: 0; left: 0;">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+                    </button>
+                    <button class="full-player-timer-btn" id="fp-timer-btn" aria-label="Timer Tidur" style="background: rgba(255, 255, 255, 0.2); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </button>
+                </div>
+                <div class="full-player-artwork">
+                    <img id="full-player-img" src="" alt="" class="full-player-cover">
+                </div>
+                <div class="full-player-details">
+                    <h2 class="full-player-title" id="full-player-title">-</h2>
+                    <p class="full-player-desc" id="full-player-desc">-</p>
+                </div>
+                <div class="full-player-progress-bar">
+                    <div class="progress-track" id="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-thumb" id="progress-thumb"></div>
+                    </div>
+                    <div class="progress-times">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">0:00</span>
+                    </div>
+                </div>
+                <div class="full-player-controls">
+                    <button class="fp-btn" id="fp-shuffle" aria-label="Acak">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+                    </button>
+                    <button class="fp-btn fp-prev" id="fp-prev" aria-label="Sebelumnya">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="fp-btn fp-play" id="fp-play" aria-label="Putar">
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="white" id="fp-play-icon"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="fp-btn fp-next" id="fp-next" aria-label="Berikutnya">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <button class="fp-btn" id="fp-favorite" aria-label="Favorit">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="white" id="fp-fav-icon">
+                            <path class="icon-plus" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                            <path class="icon-check" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom spacer for nav -->
+        <div class="bottom-spacer"></div>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav" class="bottom-nav" aria-label="Navigasi utama">
+            <button class="nav-item active" id="nav-beranda" data-page="beranda" aria-label="Beranda">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span>Beranda</span>
+            </button>
+            <button class="nav-item" id="nav-dongeng" data-page="dongeng" aria-label="Dongeng">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                </svg>
+                <span>Dongeng</span>
+            </button>
+            <button class="nav-item" id="nav-favorit" data-page="favorit" aria-label="Favorit">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Favorit</span>
+            </button>
+            <button class="nav-item" id="nav-profil" data-page="profil" aria-label="Profil">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                <span>Profil</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ======================== -->
+    <!-- ADD STORY MODAL          -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal" id="add-story-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Tambah Dongeng Baru</h2>
+                <button class="modal-close" id="modal-close-btn" aria-label="Tutup">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#6b7280"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <form id="add-story-form" class="modal-form">
+                <!-- Image Upload -->
+                <div class="upload-area" id="upload-image-area">
+                    <input type="file" id="story-image-input" accept="image/*" hidden>
+                    <div class="upload-preview" id="upload-image-preview">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="#a78bfa"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <span class="upload-label">Ketuk untuk pilih foto sampul</span>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="story-title-input" class="form-label">Judul Dongeng</label>
+                    <input type="text" id="story-title-input" class="form-input" placeholder="Masukkan judul dongeng..." required maxlength="100">
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="story-desc-input" class="form-label">Deskripsi Singkat</label>
+                    <input type="text" id="story-desc-input" class="form-input" placeholder="Cerita tentang..." maxlength="200">
+                </div>
+
+                <!-- Audio Upload -->
+                <div class="upload-area audio-upload" id="upload-audio-area">
+                    <input type="file" id="story-audio-input" accept="audio/*" hidden>
+                    <div class="upload-preview" id="upload-audio-preview">
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="#a78bfa"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
+                        <span class="upload-label">Ketuk untuk pilih file audio (MP3)</span>
+                    </div>
+                    <div class="audio-file-info hidden" id="audio-file-info">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#22c55e"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
+                        <span id="audio-file-name">-</span>
+                        <button type="button" class="remove-file-btn" id="remove-audio-btn" aria-label="Hapus">✕</button>
+                    </div>
+                </div>
+
+                <!-- Level Select -->
+                <div class="form-group">
+                    <label for="story-level-input" class="form-label">Tingkat Kesulitan</label>
+                    <select id="story-level-input" class="form-input form-select">
+                        <option value="Mudah">🟢 Mudah</option>
+                        <option value="Sedang">🟡 Sedang</option>
+                    </select>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="submit-btn" id="submit-story-btn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    <span>Simpan Dongeng</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- CUSTOM CONFIRM MODAL     -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="custom-confirm-overlay" style="z-index: 300;">
+        <div class="modal" style="height: auto; min-height: auto; max-height: 90vh; border-radius: 24px; padding: 24px; text-align: center;">
+            <h3 id="custom-confirm-title" style="margin-bottom: 8px; font-size: 1.2rem;">Konfirmasi</h3>
+            <p id="custom-confirm-msg" style="color: var(--text-light); margin-bottom: 24px; font-size: 0.95rem;">Apakah Anda yakin?</p>
+            <div style="display: flex; gap: 12px;">
+                <button id="custom-confirm-cancel" style="flex: 1; padding: 12px; border-radius: 12px; border: none; background: #f3f4f6; color: var(--text-dark); font-weight: bold; cursor: pointer;">Batal</button>
+                <button id="custom-confirm-ok" style="flex: 1; padding: 12px; border-radius: 12px; border: none; background: #ef4444; color: white; font-weight: bold; cursor: pointer;">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- CUSTOM PROMPT MODAL      -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="custom-prompt-overlay" style="z-index: 300;">
+        <div class="modal" style="height: auto; min-height: auto; max-height: 90vh; border-radius: 24px; padding: 24px;">
+            <h3 id="custom-prompt-title" style="margin-bottom: 16px; font-size: 1.2rem; text-align: center;">Edit</h3>
+            <input type="text" id="custom-prompt-input" class="form-input" style="margin-bottom: 24px; text-align: center; font-size: 1.1rem; font-weight: bold;">
+            <div style="display: flex; gap: 12px;">
+                <button id="custom-prompt-cancel" style="flex: 1; padding: 12px; border-radius: 12px; border: none; background: #f3f4f6; color: var(--text-dark); font-weight: bold; cursor: pointer;">Batal</button>
+                <button id="custom-prompt-ok" style="flex: 1; padding: 12px; border-radius: 12px; border: none; background: var(--primary-purple); color: white; font-weight: bold; cursor: pointer;">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- TIMER MODAL              -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="timer-modal-overlay" style="z-index: 250;">
+        <div class="modal" style="height: auto; min-height: auto; max-height: 90vh; border-radius: 24px; padding: 24px; background: var(--bg-card); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.2rem; color: var(--text-dark);">Timer Tidur</h3>
+                <button id="timer-close-btn" style="background: none; border: none; color: var(--text-gray); cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 20px; text-align: center;">Audio akan berhenti otomatis setelah waktu habis.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;" id="timer-options">
+                <button class="timer-option-btn active" data-minutes="0" style="padding: 14px; border-radius: 16px; border: 2px solid var(--primary-purple); background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); font-weight: bold; cursor: pointer; transition: all 0.2s;">Mati</button>
+                <button class="timer-option-btn" data-minutes="20" style="padding: 14px; border-radius: 16px; border: 2px solid transparent; background: #f3f4f6; color: var(--text-dark); font-weight: 600; cursor: pointer; transition: all 0.2s;">20 Menit</button>
+                <button class="timer-option-btn" data-minutes="30" style="padding: 14px; border-radius: 16px; border: 2px solid transparent; background: #f3f4f6; color: var(--text-dark); font-weight: 600; cursor: pointer; transition: all 0.2s;">30 Menit</button>
+                <button class="timer-option-btn" data-minutes="60" style="padding: 14px; border-radius: 16px; border: 2px solid transparent; background: #f3f4f6; color: var(--text-dark); font-weight: 600; cursor: pointer; transition: all 0.2s;">1 Jam</button>
+            </div>
+            
+            <div id="timer-countdown" style="margin-top: 24px; text-align: center; font-size: 2rem; font-weight: bold; color: var(--primary-purple); font-family: monospace; display: none;">00:00</div>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- THEME MODAL              -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="theme-modal-overlay" style="z-index: 250;">
+        <div class="modal" style="height: auto; min-height: auto; max-height: 90vh; border-radius: 24px; padding: 24px; background: var(--bg-card); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.2rem; color: var(--text-dark);">Pilih Tema Warna</h3>
+                <button id="theme-close-btn" style="background: none; border: none; color: var(--text-gray); cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;" id="theme-options">
+                <button class="theme-option-btn active" data-theme="default" style="padding: 16px; border-radius: 16px; border: 2px solid var(--primary-purple); background: #f5f0ff; color: #7c3aed; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #7c3aed;"></div>
+                    Ungu (Bawaan)
+                </button>
+                <button class="theme-option-btn" data-theme="theme-blue" style="padding: 16px; border-radius: 16px; border: 2px solid transparent; background: #eff6ff; color: #3b82f6; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6;"></div>
+                    Biru Laut
+                </button>
+                <button class="theme-option-btn" data-theme="theme-green" style="padding: 16px; border-radius: 16px; border: 2px solid transparent; background: #ecfdf5; color: #10b981; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #10b981;"></div>
+                    Hijau Alam
+                </button>
+                <button class="theme-option-btn" data-theme="theme-pink" style="padding: 16px; border-radius: 16px; border: 2px solid transparent; background: #fdf2f8; color: #ec4899; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #ec4899;"></div>
+                    Merah Muda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audio-player" preload="auto"></audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
