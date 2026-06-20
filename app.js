@@ -4,7 +4,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, onSnapshot, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCuZbTyzgcEPLolq2WCWBVoNxq0N1vK478",
@@ -21,7 +20,54 @@ const analytics = getAnalytics(app);
 const db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
-const storage = getStorage(app);
+
+// ===== IndexedDB Setup (Khusus File Audio) =====
+const DB_NAME = 'DongengAudioDB';
+const STORE_NAME = 'audio_files';
+
+const initDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+    });
+};
+
+const audioDB = {
+    async set(id, dataUrl) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const req = tx.objectStore(STORE_NAME).put({ id, dataUrl });
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async get(id) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(id);
+            req.onsuccess = () => resolve(req.result ? req.result.dataUrl : null);
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async del(id) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const req = tx.objectStore(STORE_NAME).delete(id);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+        });
+    }
+};
 
 // ===== Default Story Data =====
 const DEFAULT_STORIES = [
@@ -652,8 +698,9 @@ async function deleteCustomStory(storyId) {
             }
         }
         
-        // Delete from Firebase
+        // Delete from Firebase and Local Audio DB
         await deleteDoc(doc(db, "stories", storyId));
+        await audioDB.del('local_audio_' + storyId);
         // Note: loadCustomStories realtime listener will auto-update the UI, but we can call it to be safe (or let it be)
         await loadCustomStories();
         // Remove from favorites
@@ -916,14 +963,31 @@ function playStory(storyId) {
 }
 
 // ===== Audio Playback =====
-function playAudio(story) {
+async function playAudio(story) {
     if (!audioEl) return;
 
     stopProgressSimulation();
 
     if (story.audioUrl) {
-        // Real audio file from IndexedDB
-        audioEl.src = story.audioUrl;
+        let finalAudioUrl = story.audioUrl;
+        
+        // Handle Hybrid Storage: if it's a local audio placeholder
+        if (story.audioUrl.startsWith('local_audio_')) {
+            const localData = await audioDB.get(story.audioUrl);
+            if (localData) {
+                finalAudioUrl = localData;
+            } else {
+                showToast('❌ File audio tidak ditemukan di memori perangkat ini.');
+                audioEl.src = '';
+                audioEl.pause();
+                startProgressSimulation();
+                updatePlayPauseIcons();
+                return;
+            }
+        }
+        
+        // Real audio file
+        audioEl.src = finalAudioUrl;
         audioEl.load();
         audioEl.play().catch(e => console.log('Audio play error:', e));
     } else {
@@ -1389,39 +1453,29 @@ async function saveNewStory() {
             // Kita biarkan sebagai base64 string di Firestore (karena sudah dikompresi oleh canvas jadi kecil)
         }
 
-        // Upload Audio to Storage
+        // Save Audio Locally (Hybrid approach)
         let audioUrl = existingStory ? (existingStory.audioUrl || null) : null;
         let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
 
         if (state.pendingAudio) {
-            submitBtn.querySelector('span').textContent = 'Mengunggah Audio...';
+            submitBtn.querySelector('span').textContent = 'Memproses Audio...';
             try {
                 durationSec = await getAudioDuration(state.pendingAudio);
             } catch (e) {
                 console.log('Could not get duration, using default');
             }
             
-            // Upload to Firebase Storage with Progress
-            const audioRef = ref(storage, 'audio/' + storyId + '-' + Date.now());
-            const uploadTask = uploadBytesResumable(audioRef, state.pendingAudio);
-            
-            await new Promise((resolve, reject) => {
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        submitBtn.querySelector('span').textContent = `Mengunggah Audio... ${Math.round(progress)}%`;
-                    }, 
-                    (error) => {
-                        console.error("Upload error details:", error);
-                        reject(error);
-                    }, 
-                    () => {
-                        resolve();
-                    }
-                );
+            // Save to Local IndexedDB instead of Firebase Storage
+            const audioBase64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(state.pendingAudio);
             });
             
-            audioUrl = await getDownloadURL(audioRef);
+            const localKey = 'local_audio_' + storyId;
+            await audioDB.set(localKey, audioBase64);
+            audioUrl = localKey; // Save the key to Firestore
         }
 
         submitBtn.querySelector('span').textContent = 'Menyimpan Data...';
