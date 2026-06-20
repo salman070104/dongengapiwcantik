@@ -1,24 +1,52 @@
 // ===== Dongeng Ceria - Spotify-like App with IndexedDB =====
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+// ===== IndexedDB Setup =====
+const DB_NAME = 'DongengCeriaDB';
+const STORE_NAME = 'stories';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCuZbTyzgcEPLolq2WCWBVoNxq0N1vK478",
-  authDomain: "dongeng-ceria.firebaseapp.com",
-  projectId: "dongeng-ceria",
-  storageBucket: "dongeng-ceria.firebasestorage.app",
-  messagingSenderId: "839538455093",
-  appId: "1:839538455093:web:619bc2163d80f93e01377c",
-  measurementId: "G-3Y3L4F5CK3"
+const initDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+    });
 };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const idb = {
+    async set(id, val) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const req = tx.objectStore(STORE_NAME).put({ id, ...val });
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async del(id) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const req = tx.objectStore(STORE_NAME).delete(id);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async getAll() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => reject(req.error);
+        });
+    }
+};
 
 // ===== Default Story Data =====
 const DEFAULT_STORIES = [
@@ -113,7 +141,7 @@ let audioEl = null;
 document.addEventListener('DOMContentLoaded', async () => {
     audioEl = document.getElementById('audio-player');
 
-    // Load custom stories from Firebase
+    // Load custom stories from IndexedDB
     await loadCustomStories();
 
     initStars();
@@ -315,61 +343,37 @@ function initSleepTimer() {
     }
 }
 
-// ===== Load Custom Stories from Firebase =====
-function loadCustomStories() {
-    return new Promise((resolve) => {
-        try {
-            const storiesRef = collection(db, "stories");
-            let isFirstLoad = true;
-            onSnapshot(storiesRef, (snapshot) => {
-                const customStories = [];
-                snapshot.forEach((doc) => {
-                    customStories.push({ id: doc.id, ...doc.data() });
-                });
+// ===== Load Custom Stories from IndexedDB =====
+async function loadCustomStories() {
+    try {
+        const customStories = await idb.getAll();
 
-                // Sort by createdAt desc
-                customStories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        // Sort by createdAt desc
+        customStories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-                // Convert for display
-                const processed = customStories.map(s => {
-                    const isOriginalDefault = DEFAULT_STORIES.some(d => d.id === s.id);
-                    return {
-                        ...s,
-                        image: s.imageUrl || s.image,
-                        audioUrl: s.audioUrl || null,
-                        isDefault: isOriginalDefault,
-                        isNew: !isOriginalDefault,
-                        category: s.category || ['baru', s.level === 'Mudah' ? 'mudah' : 'sedang'],
-                    };
-                });
+        // Convert for display
+        const processed = customStories.map(s => {
+            const isOriginalDefault = DEFAULT_STORIES.some(d => d.id === s.id);
+            return {
+                ...s,
+                image: s.imageUrl || s.image,
+                audioUrl: s.audioUrl || null,
+                isDefault: isOriginalDefault,
+                isNew: !isOriginalDefault,
+                category: s.category || ['baru', s.level === 'Mudah' ? 'mudah' : 'sedang'],
+            };
+        });
 
-                // Filter out default stories that have been edited OR deleted
-                const customIds = new Set(processed.map(s => s.id));
-                const activeDefaults = DEFAULT_STORIES.filter(d => 
-                    !customIds.has(d.id) && !state.deletedDefaults.includes(d.id)
-                );
+        // Filter out default stories that have been edited OR deleted
+        const customIds = new Set(processed.map(s => s.id));
+        const activeDefaults = DEFAULT_STORIES.filter(d => 
+            !customIds.has(d.id) && !state.deletedDefaults.includes(d.id)
+        );
 
-                STORIES = [...activeDefaults, ...processed].filter(s => !state.deletedDefaults.includes(s.id));
-
-                if (!isFirstLoad) {
-                    // Re-render UI on realtime updates
-                    if (state.currentPage === 'dongeng') renderStoryGrid();
-                    if (state.currentPage === 'beranda') renderStoryList();
-                    renderRecentlyPlayed();
-                    if (state.currentPage === 'favorit') renderFavoritePage();
-                } else {
-                    isFirstLoad = false;
-                    resolve();
-                }
-            }, (error) => {
-                console.error("Firebase listen error:", error);
-                if (isFirstLoad) resolve();
-            });
-        } catch (err) {
-            console.error('Failed to init Firebase listener:', err);
-            resolve();
-        }
-    });
+        STORIES = [...activeDefaults, ...processed].filter(s => !state.deletedDefaults.includes(s.id));
+    } catch (err) {
+        console.error('Failed to load local stories:', err);
+    }
 }
 
 // ===== Audio Events (Real Playback) =====
@@ -649,10 +653,11 @@ async function deleteCustomStory(storyId) {
             }
         }
         
-        // If it's a custom story, delete it from Firebase
+        // If it's a custom story, delete it from IndexedDB
         if (!DEFAULT_STORIES.some(d => d.id === storyId)) {
-            await deleteDoc(doc(db, "stories", storyId));
+            await idb.del(storyId);
         }
+        await loadCustomStories();
         // Remove from favorites
         state.favorites = state.favorites.filter(id => id !== storyId);
         localStorage.setItem('dongeng_favorites', JSON.stringify(state.favorites));
@@ -1380,48 +1385,28 @@ async function saveNewStory() {
         const existingStory = isEditing ? STORIES.find(s => s.id === state.editingStoryId) : null;
         const storyId = isEditing ? state.editingStoryId : 'custom_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
 
-        // Upload Image if it's new (data URL)
+        // Gunakan Image data URL secara langsung (base64)
         let imageUrl = state.pendingImageDataUrl || (existingStory ? existingStory.image : generatePlaceholderImage(title));
-        if (state.pendingImageDataUrl && state.pendingImageDataUrl.startsWith('data:')) {
-            submitBtn.querySelector('span').textContent = 'Mengunggah Gambar...';
-            const imgRef = ref(storage, `images/${storyId}_${Date.now()}`);
-            await uploadString(imgRef, state.pendingImageDataUrl, 'data_url');
-            imageUrl = await getDownloadURL(imgRef);
-        }
 
-        // Upload Audio if a new file is selected
+        // Gunakan Audio data URL
         let audioUrl = existingStory ? (existingStory.audioUrl || null) : null;
         let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
 
         if (state.pendingAudio) {
-            submitBtn.querySelector('span').textContent = 'Mulai Mengunggah Audio...';
-            const audioRef = ref(storage, `audio/${storyId}_${state.pendingAudio.name.replace(/[^a-zA-Z0-9.-]/g, '')}`);
-            const uploadTask = uploadBytesResumable(audioRef, state.pendingAudio);
-            
-            await new Promise((resolve, reject) => {
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        submitBtn.querySelector('span').textContent = `Mengunggah Audio... ${Math.round(progress)}%`;
-                    }, 
-                    (error) => {
-                        console.error('Audio upload failed:', error);
-                        reject(error);
-                    }, 
-                    async () => {
-                        audioUrl = await getDownloadURL(uploadTask.snapshot.ref);
-                        resolve();
-                    }
-                );
-            });
-
             submitBtn.querySelector('span').textContent = 'Memproses Audio...';
-            // Get audio duration
             try {
                 durationSec = await getAudioDuration(state.pendingAudio);
             } catch (e) {
                 console.log('Could not get duration, using default');
             }
+            
+            // Konversi file audio menjadi Base64 string
+            audioUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(state.pendingAudio);
+            });
         }
 
         submitBtn.querySelector('span').textContent = 'Menyimpan Data...';
@@ -1440,8 +1425,15 @@ async function saveNewStory() {
             category: ['baru', level === 'Mudah' ? 'mudah' : 'sedang']
         };
 
-        // Save to Firebase Firestore
-        await setDoc(doc(db, "stories", storyId), storyRecord);
+        // Simpan ke IndexedDB
+        await idb.set(storyId, storyRecord);
+
+        // Muat ulang data ke state dan render ulang UI
+        await loadCustomStories();
+        if (state.currentPage === 'dongeng') renderStoryGrid();
+        if (state.currentPage === 'beranda') renderStoryList();
+        renderRecentlyPlayed();
+        if (state.currentPage === 'favorit') renderFavoritePage();
 
         // Close modal
         closeModal();
