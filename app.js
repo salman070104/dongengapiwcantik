@@ -1,75 +1,24 @@
 // ===== Dongeng Ceria - Spotify-like App with IndexedDB =====
 
-// ===== IndexedDB Database =====
-const DB_NAME = 'DongengCeriaDB';
-const DB_VERSION = 1;
-const STORE_NAME = 'stories';
-let db = null;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
+import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getStorage, ref, uploadString, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
+const firebaseConfig = {
+  apiKey: "AIzaSyCuZbTyzgcEPLolq2WCWBVoNxq0N1vK478",
+  authDomain: "dongeng-ceria.firebaseapp.com",
+  projectId: "dongeng-ceria",
+  storageBucket: "dongeng-ceria.firebasestorage.app",
+  messagingSenderId: "839538455093",
+  appId: "1:839538455093:web:619bc2163d80f93e01377c",
+  measurementId: "G-3Y3L4F5CK3"
+};
 
-        request.onupgradeneeded = (e) => {
-            const database = e.target.result;
-            if (!database.objectStoreNames.contains(STORE_NAME)) {
-                const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                store.createIndex('name', 'name', { unique: false });
-                store.createIndex('createdAt', 'createdAt', { unique: false });
-            }
-        };
-
-        request.onsuccess = (e) => {
-            db = e.target.result;
-            resolve(db);
-        };
-
-        request.onerror = (e) => {
-            console.error('DB error:', e.target.error);
-            reject(e.target.error);
-        };
-    });
-}
-
-function dbAdd(story) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.put(story);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-function dbGetAll() {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-function dbGet(id) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(id);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-function dbDelete(id) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.delete(id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // ===== Default Story Data =====
 const DEFAULT_STORIES = [
@@ -164,8 +113,7 @@ let audioEl = null;
 document.addEventListener('DOMContentLoaded', async () => {
     audioEl = document.getElementById('audio-player');
 
-    // Open database & load custom stories
-    await openDB();
+    // Load custom stories from Firebase
     await loadCustomStories();
 
     initStars();
@@ -367,36 +315,61 @@ function initSleepTimer() {
     }
 }
 
-// ===== Load Custom Stories from IndexedDB =====
-async function loadCustomStories() {
-    try {
-        const customStories = await dbGetAll();
-        // Sort by createdAt desc
-        customStories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+// ===== Load Custom Stories from Firebase =====
+function loadCustomStories() {
+    return new Promise((resolve) => {
+        try {
+            const storiesRef = collection(db, "stories");
+            let isFirstLoad = true;
+            onSnapshot(storiesRef, (snapshot) => {
+                const customStories = [];
+                snapshot.forEach((doc) => {
+                    customStories.push({ id: doc.id, ...doc.data() });
+                });
 
-        // Convert blob URLs for display
-        const processed = customStories.map(s => {
-            const isOriginalDefault = DEFAULT_STORIES.some(d => d.id === s.id);
-            return {
-                ...s,
-                image: s.imageData || s.image,
-                audioUrl: s.audioData ? URL.createObjectURL(new Blob([s.audioData], { type: s.audioType || 'audio/mpeg' })) : null,
-                isDefault: isOriginalDefault,
-                isNew: !isOriginalDefault,
-                category: s.category || ['baru', s.level === 'Mudah' ? 'mudah' : 'sedang'],
-            };
-        });
+                // Sort by createdAt desc
+                customStories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-        // Filter out default stories that have been edited (exist in DB) OR deleted
-        const customIds = new Set(processed.map(s => s.id));
-        const activeDefaults = DEFAULT_STORIES.filter(d => 
-            !customIds.has(d.id) && !state.deletedDefaults.includes(d.id)
-        );
+                // Convert for display
+                const processed = customStories.map(s => {
+                    const isOriginalDefault = DEFAULT_STORIES.some(d => d.id === s.id);
+                    return {
+                        ...s,
+                        image: s.imageUrl || s.image,
+                        audioUrl: s.audioUrl || null,
+                        isDefault: isOriginalDefault,
+                        isNew: !isOriginalDefault,
+                        category: s.category || ['baru', s.level === 'Mudah' ? 'mudah' : 'sedang'],
+                    };
+                });
 
-        STORIES = [...activeDefaults, ...processed].filter(s => !state.deletedDefaults.includes(s.id));
-    } catch (err) {
-        console.error('Failed to load custom stories:', err);
-    }
+                // Filter out default stories that have been edited OR deleted
+                const customIds = new Set(processed.map(s => s.id));
+                const activeDefaults = DEFAULT_STORIES.filter(d => 
+                    !customIds.has(d.id) && !state.deletedDefaults.includes(d.id)
+                );
+
+                STORIES = [...activeDefaults, ...processed].filter(s => !state.deletedDefaults.includes(s.id));
+
+                if (!isFirstLoad) {
+                    // Re-render UI on realtime updates
+                    if (state.currentPage === 'dongeng') renderStoryGrid();
+                    if (state.currentPage === 'beranda') renderStoryList();
+                    renderRecentlyPlayed();
+                    if (state.currentPage === 'favorit') renderFavoritePage();
+                } else {
+                    isFirstLoad = false;
+                    resolve();
+                }
+            }, (error) => {
+                console.error("Firebase listen error:", error);
+                if (isFirstLoad) resolve();
+            });
+        } catch (err) {
+            console.error('Failed to init Firebase listener:', err);
+            resolve();
+        }
+    });
 }
 
 // ===== Audio Events (Real Playback) =====
@@ -676,9 +649,10 @@ async function deleteCustomStory(storyId) {
             }
         }
         
-        await dbDelete(storyId);
-        // Remove from STORIES array
-        STORIES = STORIES.filter(s => s.id !== storyId);
+        // If it's a custom story, delete it from Firebase
+        if (!DEFAULT_STORIES.some(d => d.id === storyId)) {
+            await deleteDoc(doc(db, "stories", storyId));
+        }
         // Remove from favorites
         state.favorites = state.favorites.filter(id => id !== storyId);
         localStorage.setItem('dongeng_favorites', JSON.stringify(state.favorites));
@@ -1406,19 +1380,22 @@ async function saveNewStory() {
         const existingStory = isEditing ? STORIES.find(s => s.id === state.editingStoryId) : null;
         const storyId = isEditing ? state.editingStoryId : 'custom_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
 
-        // Read audio file as ArrayBuffer
-        let audioData = null;
-        let audioType = null;
-        let durationSec = 300; // default 5 min
+        // Upload Image if it's new (data URL)
+        let imageUrl = state.pendingImageDataUrl || (existingStory ? existingStory.image : generatePlaceholderImage(title));
+        if (state.pendingImageDataUrl && state.pendingImageDataUrl.startsWith('data:')) {
+            const imgRef = ref(storage, `images/${storyId}_${Date.now()}`);
+            await uploadString(imgRef, state.pendingImageDataUrl, 'data_url');
+            imageUrl = await getDownloadURL(imgRef);
+        }
 
-        // If editing and no new audio is selected, preserve existing audio
-        if (isEditing && !state.pendingAudio && existingStory && existingStory.audioData) {
-            audioData = existingStory.audioData;
-            audioType = existingStory.audioType;
-            durationSec = existingStory.durationSec || 300;
-        } else if (state.pendingAudio) {
-            audioData = await readFileAsArrayBuffer(state.pendingAudio);
-            audioType = state.pendingAudio.type || 'audio/mpeg';
+        // Upload Audio if a new file is selected
+        let audioUrl = existingStory ? (existingStory.audioUrl || null) : null;
+        let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
+
+        if (state.pendingAudio) {
+            const audioRef = ref(storage, `audio/${storyId}_${state.pendingAudio.name.replace(/[^a-zA-Z0-9.-]/g, '')}`);
+            await uploadBytes(audioRef, state.pendingAudio);
+            audioUrl = await getDownloadURL(audioRef);
 
             // Get audio duration
             try {
@@ -1432,39 +1409,23 @@ async function saveNewStory() {
         const sec = Math.floor(durationSec % 60);
 
         const storyRecord = {
-            id: storyId,
             name: title,
             desc: desc,
-            imageData: state.pendingImageDataUrl || (existingStory ? existingStory.image : generatePlaceholderImage(title)),
-            audioData: audioData,
-            audioType: audioType,
+            imageUrl: imageUrl,
+            audioUrl: audioUrl,
             duration: `${min}:${sec.toString().padStart(2, '0')}`,
             durationSec: Math.floor(durationSec),
             level: level,
             createdAt: isEditing ? (existingStory?.createdAt || Date.now()) : Date.now(),
+            category: ['baru', level === 'Mudah' ? 'mudah' : 'sedang']
         };
 
-        // Save to IndexedDB
-        await dbAdd(storyRecord);
+        // Save to Firebase Firestore
+        await setDoc(doc(db, "stories", storyId), storyRecord);
 
-        // Add to runtime array
-        const runtimeStory = {
-            ...storyRecord,
-            image: storyRecord.imageData,
-            audioUrl: audioData ? URL.createObjectURL(new Blob([audioData], { type: audioType })) : null,
-            isDefault: false,
-            isNew: true,
-            category: ['baru', level === 'Mudah' ? 'mudah' : 'sedang'],
-        };
-
-        STORIES.push(runtimeStory);
-
-        // Close modal & refresh
+        // Close modal
         closeModal();
-        renderStoryList();
-        renderStoryGrid();
-        renderRecentlyPlayed();
-        showToast(`✅ "${title}" berhasil ditambahkan!`);
+        showToast(isEditing ? '✅ Dongeng diperbarui' : '✨ Dongeng berhasil dibuat');
 
     } catch (err) {
         console.error('Save failed:', err);
