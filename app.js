@@ -1327,33 +1327,7 @@ function initAddStoryModal() {
         reader.readAsDataURL(file);
     });
 
-    // Audio upload
-    audioArea.querySelector('.upload-preview').addEventListener('click', () => audioInput.click());
-    audioInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        state.pendingAudio = file;
-        state.pendingAudioName = file.name;
-
-        const audioPreview = document.getElementById('upload-audio-preview');
-        const audioInfo = document.getElementById('audio-file-info');
-        const audioFileName = document.getElementById('audio-file-name');
-
-        audioPreview.style.display = 'none';
-        audioInfo.classList.remove('hidden');
-        audioFileName.textContent = file.name;
-    });
-
-    // Remove audio
-    removeAudioBtn.addEventListener('click', () => {
-        state.pendingAudio = null;
-        state.pendingAudioName = null;
-        audioInput.value = '';
-
-        document.getElementById('upload-audio-preview').style.display = '';
-        document.getElementById('audio-file-info').classList.add('hidden');
-    });
+    // No more local audio upload listeners needed
 
     // Submit form
     form.addEventListener('submit', async (e) => {
@@ -1372,8 +1346,6 @@ function resetForm() {
     document.getElementById('add-story-form').reset();
     state.pendingImage = null;
     state.pendingImageDataUrl = null;
-    state.pendingAudio = null;
-    state.pendingAudioName = null;
     state.editingStoryId = null;
 
     document.querySelector('.modal-header h2').textContent = 'Tambah Dongeng Baru';
@@ -1384,10 +1356,6 @@ function resetForm() {
     const img = preview.querySelector('img');
     if (img) img.remove();
     preview.classList.remove('has-image');
-
-    // Reset audio preview
-    document.getElementById('upload-audio-preview').style.display = '';
-    document.getElementById('audio-file-info').classList.add('hidden');
 }
 
 // ===== Edit Story Modal =====
@@ -1418,9 +1386,13 @@ function openEditStoryModal(storyId) {
     }
 
     if (story.audioUrl) {
-        document.getElementById('upload-audio-preview').style.display = 'none';
-        document.getElementById('audio-file-info').classList.remove('hidden');
-        document.getElementById('audio-file-name').textContent = 'Audio Tersimpan';
+        // Convert back to standard link for display if it's a download link
+        let displayUrl = story.audioUrl;
+        const driveIdMatch = story.audioUrl.match(/id=([a-zA-Z0-9_-]+)/);
+        if (driveIdMatch && driveIdMatch[1]) {
+            displayUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/view`;
+        }
+        document.getElementById('story-audio-input').value = displayUrl;
     }
 
     document.getElementById('modal-overlay').classList.remove('hidden');
@@ -1453,29 +1425,22 @@ async function saveNewStory() {
             // Kita biarkan sebagai base64 string di Firestore (karena sudah dikompresi oleh canvas jadi kecil)
         }
 
-        // Save Audio Locally (Hybrid approach)
+        // Handle Google Drive Audio Link
         let audioUrl = existingStory ? (existingStory.audioUrl || null) : null;
         let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
 
-        if (state.pendingAudio) {
-            submitBtn.querySelector('span').textContent = 'Memproses Audio...';
-            try {
-                durationSec = await getAudioDuration(state.pendingAudio);
-            } catch (e) {
-                console.log('Could not get duration, using default');
+        let inputAudioUrl = document.getElementById('story-audio-input').value.trim();
+        if (inputAudioUrl) {
+            // Convert standard Google Drive link to direct download link
+            const driveMatch = inputAudioUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                audioUrl = `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+            } else {
+                audioUrl = inputAudioUrl; // If not standard GDrive, use as is
             }
-            
-            // Save to Local IndexedDB instead of Firebase Storage
-            const audioBase64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(reader.error);
-                reader.readAsDataURL(state.pendingAudio);
-            });
-            
-            const localKey = 'local_audio_' + storyId;
-            await audioDB.set(localKey, audioBase64);
-            audioUrl = localKey; // Save the key to Firestore
+            durationSec = 300; // default duration
+        } else if (!isEditing) {
+            audioUrl = null; // No audio provided
         }
 
         submitBtn.querySelector('span').textContent = 'Menyimpan Data...';

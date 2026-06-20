@@ -401,18 +401,13 @@
                     <input type="text" id="story-desc-input" class="form-input" placeholder="Cerita tentang..." maxlength="200">
                 </div>
 
-                <!-- Audio Upload -->
-                <div class="upload-area audio-upload" id="upload-audio-area">
-                    <input type="file" id="story-audio-input" accept="audio/*" hidden>
-                    <div class="upload-preview" id="upload-audio-preview">
-                        <svg viewBox="0 0 24 24" width="36" height="36" fill="#a78bfa"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
-                        <span class="upload-label">Ketuk untuk pilih file audio (MP3)</span>
-                    </div>
-                    <div class="audio-file-info hidden" id="audio-file-info">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#22c55e"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
-                        <span id="audio-file-name">-</span>
-                        <button type="button" class="remove-file-btn" id="remove-audio-btn" aria-label="Hapus">✕</button>
-                    </div>
+                <!-- Audio Link (Google Drive) -->
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label for="story-audio-input" class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Link Audio Google Drive</span>
+                    </label>
+                    <input type="url" id="story-audio-input" class="form-input" placeholder="https://drive.google.com/file/d/.../view">
+                    <p style="font-size: 11px; color: #8e8e93; margin-top: 8px; line-height: 1.4;"><b>Penting:</b> Upload MP3 Anda ke Google Drive, lalu klik Share > Copy Link. Pastikan akses sudah diubah menjadi <b>"Anyone with the link"</b> (Siapa saja yang memiliki link).</p>
                 </div>
 
                 <!-- Level Select -->
