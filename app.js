@@ -3,7 +3,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
 import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+import { getStorage, ref, uploadString, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCuZbTyzgcEPLolq2WCWBVoNxq0N1vK478",
@@ -1383,6 +1383,7 @@ async function saveNewStory() {
         // Upload Image if it's new (data URL)
         let imageUrl = state.pendingImageDataUrl || (existingStory ? existingStory.image : generatePlaceholderImage(title));
         if (state.pendingImageDataUrl && state.pendingImageDataUrl.startsWith('data:')) {
+            submitBtn.querySelector('span').textContent = 'Mengunggah Gambar...';
             const imgRef = ref(storage, `images/${storyId}_${Date.now()}`);
             await uploadString(imgRef, state.pendingImageDataUrl, 'data_url');
             imageUrl = await getDownloadURL(imgRef);
@@ -1393,10 +1394,28 @@ async function saveNewStory() {
         let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
 
         if (state.pendingAudio) {
+            submitBtn.querySelector('span').textContent = 'Mulai Mengunggah Audio...';
             const audioRef = ref(storage, `audio/${storyId}_${state.pendingAudio.name.replace(/[^a-zA-Z0-9.-]/g, '')}`);
-            await uploadBytes(audioRef, state.pendingAudio);
-            audioUrl = await getDownloadURL(audioRef);
+            const uploadTask = uploadBytesResumable(audioRef, state.pendingAudio);
+            
+            await new Promise((resolve, reject) => {
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        submitBtn.querySelector('span').textContent = `Mengunggah Audio... ${Math.round(progress)}%`;
+                    }, 
+                    (error) => {
+                        console.error('Audio upload failed:', error);
+                        reject(error);
+                    }, 
+                    async () => {
+                        audioUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                        resolve();
+                    }
+                );
+            });
 
+            submitBtn.querySelector('span').textContent = 'Memproses Audio...';
             // Get audio duration
             try {
                 durationSec = await getAudioDuration(state.pendingAudio);
@@ -1405,6 +1424,7 @@ async function saveNewStory() {
             }
         }
 
+        submitBtn.querySelector('span').textContent = 'Menyimpan Data...';
         const min = Math.floor(durationSec / 60);
         const sec = Math.floor(durationSec % 60);
 
