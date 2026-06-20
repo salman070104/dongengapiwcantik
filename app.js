@@ -1391,6 +1391,8 @@ function openEditStoryModal(storyId) {
         const driveIdMatch = story.audioUrl.match(/id=([a-zA-Z0-9_-]+)/);
         if (driveIdMatch && driveIdMatch[1]) {
             displayUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/view`;
+        } else if (story.audioUrl.includes('dl.dropboxusercontent.com')) {
+            displayUrl = story.audioUrl.replace('dl.dropboxusercontent.com', 'www.dropbox.com').replace('?dl=1', '?dl=0');
         }
         document.getElementById('story-audio-input').value = displayUrl;
     }
@@ -1425,7 +1427,7 @@ async function saveNewStory() {
             // Kita biarkan sebagai base64 string di Firestore (karena sudah dikompresi oleh canvas jadi kecil)
         }
 
-        // Handle Google Drive Audio Link
+        // Handle Google Drive / Dropbox Audio Link
         let audioUrl = existingStory ? (existingStory.audioUrl || null) : null;
         let durationSec = existingStory ? (existingStory.durationSec || 300) : 300;
 
@@ -1435,8 +1437,14 @@ async function saveNewStory() {
             const driveMatch = inputAudioUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
             if (driveMatch && driveMatch[1]) {
                 audioUrl = `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+            } else if (inputAudioUrl.includes('dropbox.com')) {
+                // Convert Dropbox link to direct download link
+                audioUrl = inputAudioUrl.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '?dl=1');
+                if (!audioUrl.includes('?dl=1')) {
+                    audioUrl += '?dl=1';
+                }
             } else {
-                audioUrl = inputAudioUrl; // If not standard GDrive, use as is
+                audioUrl = inputAudioUrl; // If not standard GDrive/Dropbox, use as is
             }
             durationSec = 300; // default duration
         } else if (!isEditing) {
