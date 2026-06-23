@@ -1312,17 +1312,47 @@ function initAddStoryModal() {
 
         const reader = new FileReader();
         reader.onload = (ev) => {
-            state.pendingImageDataUrl = ev.target.result;
-            const preview = document.getElementById('upload-image-preview');
-            // Replace content with image
-            let img = preview.querySelector('img');
-            if (!img) {
-                img = document.createElement('img');
-                preview.appendChild(img);
-            }
-            img.src = ev.target.result;
-            img.alt = 'Preview';
-            preview.classList.add('has-image');
+            const imgToCompress = new Image();
+            imgToCompress.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500;
+                const MAX_HEIGHT = 500;
+                let width = imgToCompress.width;
+                let height = imgToCompress.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgToCompress, 0, 0, width, height);
+
+                // Kompres menjadi JPEG kualitas 0.7 agar tidak melewati limit 1MB Firestore
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                state.pendingImageDataUrl = compressedDataUrl;
+                
+                const preview = document.getElementById('upload-image-preview');
+                // Replace content with image
+                let imgPreview = preview.querySelector('img');
+                if (!imgPreview) {
+                    imgPreview = document.createElement('img');
+                    preview.appendChild(imgPreview);
+                }
+                imgPreview.src = compressedDataUrl;
+                imgPreview.alt = 'Preview';
+                preview.classList.add('has-image');
+            };
+            imgToCompress.src = ev.target.result;
         };
         reader.readAsDataURL(file);
     });
