@@ -73,6 +73,65 @@ body.theme-pink {
     --shadow-play: 0 6px 30px rgba(139, 92, 246, 0.4);
 }
 
+body.theme-dark {
+    --primary-purple: #8b5cf6;
+    --primary-dark: #1e1b4b;
+    --primary-light: #a78bfa;
+    --pink-accent: #f472b6;
+    --pink-light: #fbcfe8;
+    --pink-btn: #ec4899;
+    --bg-light: #111827; 
+    --bg-card: #1f2937; 
+    --text-dark: #f9fafb;
+    --text-medium: #d1d5db;
+    --text-light: #9ca3af;
+    --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-play: 0 6px 30px rgba(236, 72, 153, 0.3);
+}
+
+/* Override untuk dark mode */
+body.theme-dark .player-card,
+body.theme-dark .search-box {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.theme-dark .chip {
+    background: #1f2937;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.theme-dark .grid-card {
+    background: #1f2937;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .bottom-nav {
+    background: rgba(17, 24, 39, 0.95);
+    border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .form-input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+}
+
+body.theme-dark .theme-option-btn,
+body.theme-dark .timer-option-btn,
+body.theme-dark #custom-confirm-cancel,
+body.theme-dark #custom-prompt-cancel {
+    background: #374151 !important;
+    color: #f9fafb !important;
+}
+
+body.theme-dark .theme-option-btn.active,
+body.theme-dark .timer-option-btn.active {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: var(--primary-purple) !important;
+}
+
 html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
