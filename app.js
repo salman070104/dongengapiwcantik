@@ -206,6 +206,77 @@ function initSettingsMenu() {
         });
     }
 
+    // === Homepage Settings Icon (top-right gear) ===
+    const settingsBtn = document.getElementById('settings-btn');
+    const mainSettingsOverlay = document.getElementById('main-settings-overlay');
+    const mainSettingsClose = document.getElementById('main-settings-close');
+
+    if (settingsBtn && mainSettingsOverlay) {
+        settingsBtn.addEventListener('click', () => {
+            mainSettingsOverlay.classList.remove('hidden');
+        });
+
+        if (mainSettingsClose) {
+            mainSettingsClose.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+            });
+        }
+
+        mainSettingsOverlay.addEventListener('click', (e) => {
+            if (e.target === mainSettingsOverlay) mainSettingsOverlay.classList.add('hidden');
+        });
+
+        // Wire modal menu items to same actions as profil menu
+        const modalTimerBtn = document.getElementById('modal-menu-timer-settings');
+        const modalThemeBtn = document.getElementById('modal-menu-theme');
+        const modalNotifBtn = document.getElementById('modal-menu-notif');
+        const modalAboutBtn = document.getElementById('modal-menu-about');
+        const modalInstallBtn = document.getElementById('modal-menu-install-app');
+
+        if (modalTimerBtn && timerOverlay) {
+            modalTimerBtn.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+                timerOverlay.classList.remove('hidden');
+            });
+        }
+        if (modalThemeBtn) {
+            modalThemeBtn.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+                const themeOvl = document.getElementById('theme-modal-overlay');
+                const themeOpts = document.querySelectorAll('.theme-option-btn');
+                themeOpts.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                    if (b.dataset.theme === state.theme) {
+                        b.classList.add('active');
+                        b.style.borderColor = b.querySelector('div').style.backgroundColor;
+                    }
+                });
+                if (themeOvl) themeOvl.classList.remove('hidden');
+            });
+        }
+        if (modalNotifBtn) {
+            modalNotifBtn.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+                showToast('🔔 Fitur notifikasi segera hadir!');
+            });
+        }
+        if (modalAboutBtn) {
+            modalAboutBtn.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+                showToast('✨ Dongeng Pengantar Tidur Api Cantik v1.0');
+            });
+        }
+        if (modalInstallBtn) {
+            modalInstallBtn.addEventListener('click', () => {
+                mainSettingsOverlay.classList.add('hidden');
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                }
+            });
+        }
+    }
+
     // Theme Overlay
     const themeOverlay = document.getElementById('theme-modal-overlay');
     const themeCloseBtn = document.getElementById('theme-close-btn');
@@ -403,7 +474,7 @@ function loadCustomStories() {
 
                 if (!isFirstLoad) {
                     // Re-render UI on realtime updates
-                    if (state.currentPage === 'dongeng') renderStoryGrid();
+                    if (state.currentPage === 'dongeng') renderStoryGrid('semua', '', false);
                     if (state.currentPage === 'beranda') renderStoryList();
                     renderRecentlyPlayed();
                     if (state.currentPage === 'favorit') renderFavoritePage();
@@ -611,7 +682,7 @@ function renderStoryList() {
 }
 
 // ===== Render Story Grid (Dongeng Page) =====
-function renderStoryGrid(filter = 'semua', searchQuery = '') {
+function renderStoryGrid(filter = 'semua', searchQuery = '', animate = true) {
     const container = document.getElementById('story-grid');
     if (!container) return;
 
@@ -632,7 +703,7 @@ function renderStoryGrid(filter = 'semua', searchQuery = '') {
     }
 
     container.innerHTML = filtered.map(story => `
-        <article class="story-card ${state.currentStory?.id === story.id ? 'now-playing' : ''}" data-story-id="${story.id}" style="position: relative;">
+        <article class="story-card ${state.currentStory?.id === story.id ? 'now-playing' : ''}" data-story-id="${story.id}" style="position: relative; ${!animate ? 'animation: none; opacity: 1;' : ''}">
             <div class="story-thumb">
                 <img src="${story.image}" alt="${story.name}" loading="lazy">
             </div>

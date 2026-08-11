@@ -288,7 +288,7 @@
         <div class="full-player hidden" id="full-player">
             <div class="full-player-bg" id="full-player-bg"></div>
             <div class="full-player-inner">
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: absolute; top: 20px; left: 0; padding: 0 20px; z-index: 10;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: absolute; top: calc(env(safe-area-inset-top, 20px) + 24px); left: 0; padding: 0 20px; z-index: 10;">
                     <button class="full-player-close" id="full-player-close" aria-label="Tutup" style="position: relative; top: 0; left: 0;">
                         <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
                     </button>
@@ -513,6 +513,58 @@
                 <button class="theme-option-btn" data-theme="theme-dark" style="padding: 16px; border-radius: 16px; border: 2px solid transparent; background: #1f2937; color: #f9fafb; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; grid-column: 1 / -1;">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: #111827; border: 1px solid #4b5563;"></div>
                     Gelap (Malam)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================== -->
+    <!-- MAIN SETTINGS MODAL      -->
+    <!-- ======================== -->
+    <div class="modal-overlay hidden" id="main-settings-overlay" style="z-index: 200;">
+        <div class="modal" style="height: auto; min-height: auto; max-height: 90vh; border-radius: 24px; padding: 24px; background: var(--bg-card); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.2rem; color: var(--text-dark);">Pengaturan</h3>
+                <button id="main-settings-close" style="background: none; border: none; color: var(--text-gray); cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            
+            <div class="profil-menu" style="margin-top: 0;">
+                <button class="menu-item" id="modal-menu-notif">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                    <span>Notifikasi</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+                <button class="menu-item" id="modal-menu-timer-settings">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    <span>Pengaturan Timer</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+                <button class="menu-item" id="modal-menu-theme">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                    </svg>
+                    <span>Tema Tampilan</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+                <button class="menu-item hidden" id="modal-menu-install-app">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    <span>Download Aplikasi</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+                <button class="menu-item" id="modal-menu-about">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#7c3aed">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    <span>Tentang Aplikasi</span>
+                    <svg class="menu-arrow" viewBox="0 0 24 24" width="18" height="18" fill="#9ca3af"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                 </button>
             </div>
         </div>
