@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initAddStoryModal();
     initProfilUI();
     initAudioEvents();
+    initMediaSession();
     initSleepTimer();
     initSettingsMenu();
     registerServiceWorker();
@@ -455,6 +456,33 @@ function initAudioEvents() {
             state.currentStory.duration = `${min}:${sec.toString().padStart(2, '0')}`;
         }
     });
+}
+
+// ===== Media Session (Background Playback) =====
+function initMediaSession() {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => {
+            if (!state.isPlaying) togglePlayPause();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+            if (state.isPlaying) togglePlayPause();
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', () => playPrevious());
+        navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+    }
+}
+
+function updateMediaSession(story) {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: story.name,
+            artist: 'Dongeng Api Cantik',
+            album: 'Dongeng Pengantar Tidur',
+            artwork: [
+                { src: story.image, sizes: '512x512', type: 'image/png' }
+            ]
+        });
+    }
 }
 
 // ===== Star Generation =====
@@ -972,6 +1000,9 @@ function playStory(storyId) {
 
     // Update full player
     updateFullPlayer(story);
+
+    // Update OS Media Session (Background playback)
+    updateMediaSession(story);
 
     // Play audio
     playAudio(story);
