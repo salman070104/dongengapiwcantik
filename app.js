@@ -978,7 +978,13 @@ function playStory(storyId) {
 
     // Update UI
     renderRecentlyPlayed();
-    renderStoryGrid(document.querySelector('.chip.active')?.dataset.category || 'semua');
+    document.querySelectorAll('.story-card').forEach(card => {
+        if (card.dataset.storyId === storyId) {
+            card.classList.add('now-playing');
+        } else {
+            card.classList.remove('now-playing');
+        }
+    });
 
     showToast(`▶ ${story.name}`);
     if (navigator.vibrate) navigator.vibrate(15);
