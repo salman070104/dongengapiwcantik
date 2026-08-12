@@ -746,6 +746,7 @@ body {
     align-items: center;
     gap: 4px;
     flex-shrink: 0;
+    margin-top: 8px;
 }
 
 .story-card-actions .story-play-btn {
