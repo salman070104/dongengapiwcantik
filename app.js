@@ -731,15 +731,16 @@ function renderStoryGrid(filter = 'semua', searchQuery = '', animate = true) {
                 ` : ''}
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                <button class="grid-card-fav ${state.favorites.includes(story.id) ? 'is-fav' : ''}" data-fav-id="${story.id}" aria-label="Favorit" style="position: static; width: 32px; height: 32px; background: rgba(124, 58, 237, 0.1);">
+            <div class="story-card-actions">
+                <button class="story-play-btn grid-card-play ${state.currentStory?.id === story.id && state.isPlaying ? 'is-playing' : ''}" data-play-id="${story.id}" aria-label="Putar ${story.name}">
+                    <svg class="icon-play" viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    <svg class="icon-equalizer" viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V8h-2v10zm4-6v4h2v-4h-2z"/></svg>
+                </button>
+                <button class="grid-card-fav ${state.favorites.includes(story.id) ? 'is-fav' : ''}" data-fav-id="${story.id}" aria-label="Favorit">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--primary-purple)">
                         <path class="icon-plus" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
                         <path class="icon-check" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                     </svg>
-                </button>
-                <button class="story-play-btn grid-card-play" data-play-id="${story.id}" aria-label="Putar ${story.name}" style="width: 32px; height: 32px;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M8 5v14l11-7z"/></svg>
                 </button>
             </div>
 
@@ -1085,6 +1086,14 @@ function playStory(storyId) {
             card.classList.add('now-playing');
         } else {
             card.classList.remove('now-playing');
+        }
+    });
+    // Update play button icons (show equalizer for playing story)
+    document.querySelectorAll('.grid-card-play').forEach(btn => {
+        if (btn.dataset.playId === storyId) {
+            btn.classList.add('is-playing');
+        } else {
+            btn.classList.remove('is-playing');
         }
     });
 

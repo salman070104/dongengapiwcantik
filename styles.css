@@ -132,6 +132,34 @@ body.theme-dark .timer-option-btn.active {
     color: var(--primary-purple) !important;
 }
 
+body.theme-dark .modal {
+    background: #1f2937;
+}
+
+body.theme-dark .modal-header {
+    background: #1f2937;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+body.theme-dark .menu-item {
+    background: #374151;
+    color: #f9fafb;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-dark .menu-item:hover {
+    background: #4b5563;
+}
+
+body.theme-dark .story-card {
+    background: #1f2937;
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.theme-dark .story-card:hover {
+    box-shadow: 0 6px 24px rgba(139, 92, 246, 0.2);
+}
+
 html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
@@ -695,6 +723,56 @@ body {
     margin-left: 2px;
 }
 
+/* Play/Equalizer icon toggle */
+.story-play-btn .icon-equalizer { display: none; }
+.story-play-btn.is-playing .icon-play { display: none; }
+.story-play-btn.is-playing .icon-equalizer {
+    display: block;
+    margin-left: 0;
+    animation: equalizerPulse 1s ease-in-out infinite alternate;
+}
+.story-play-btn.is-playing {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+@keyframes equalizerPulse {
+    0% { transform: scaleY(0.85); }
+    100% { transform: scaleY(1.15); }
+}
+
+/* Story Card Actions (play + fav on dongeng page) */
+.story-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.story-card-actions .story-play-btn {
+    width: 36px;
+    height: 36px;
+}
+
+.story-card-actions .grid-card-fav {
+    position: static;
+    width: 30px;
+    height: 30px;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 50%;
+}
+
+/* Now-playing story card highlight */
+.story-card.now-playing {
+    border-color: var(--primary-purple);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.05));
+}
+
+body.theme-dark .story-card.now-playing {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.08));
+    border-color: var(--primary-purple);
+}
 /* ===== Page System ===== */
 .page {
     display: none;

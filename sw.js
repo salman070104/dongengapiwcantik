@@ -1,5 +1,5 @@
 // Dongeng Pengantar Tidur Api Cantik - Service Worker
-const CACHE_NAME = 'dongeng-ceria-v10';
+const CACHE_NAME = 'dongeng-ceria-v11';
 const ASSETS_TO_CACHE = [
     '/images/hero-characters.png',
     '/images/story-kelinci.png',
