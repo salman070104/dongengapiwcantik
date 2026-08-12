@@ -661,8 +661,9 @@ function renderStoryList() {
                     </span>
                 </div>
             </div>
-            <button class="story-play-btn" aria-label="Putar ${story.name}" data-play-id="${story.id}">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M8 5v14l11-7z"/></svg>
+            <button class="story-play-btn ${state.currentStory?.id === story.id && state.isPlaying ? 'is-playing' : ''}" aria-label="Putar ${story.name}" data-play-id="${story.id}">
+                <svg class="icon-play" viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="icon-equalizer" viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V8h-2v10zm4-6v4h2v-4h-2z"/></svg>
             </button>
         </article>
     `).join('');
@@ -925,8 +926,9 @@ function renderFavoritePage() {
                     </span>
                 </div>
             </div>
-            <button class="story-play-btn" aria-label="Putar ${story.name}" data-play-id="${story.id}">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M8 5v14l11-7z"/></svg>
+            <button class="story-play-btn ${state.currentStory?.id === story.id && state.isPlaying ? 'is-playing' : ''}" aria-label="Putar ${story.name}" data-play-id="${story.id}">
+                <svg class="icon-play" viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="icon-equalizer" viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V8h-2v10zm4-6v4h2v-4h-2z"/></svg>
             </button>
         </article>
     `).join('')}</div>`;
@@ -1089,7 +1091,7 @@ function playStory(storyId) {
         }
     });
     // Update play button icons (show equalizer for playing story)
-    document.querySelectorAll('.grid-card-play').forEach(btn => {
+    document.querySelectorAll('.story-play-btn').forEach(btn => {
         if (btn.dataset.playId === storyId) {
             btn.classList.add('is-playing');
         } else {
