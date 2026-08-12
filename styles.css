@@ -1988,9 +1988,20 @@ body.theme-dark .story-card.now-playing {
 .story-card:nth-child(6) { animation-delay: 1.65s; }
 
 /* --- Bottom nav entrance --- */
+@keyframes navSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 .bottom-nav {
     opacity: 0;
-    animation: slideInFromBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+    animation: navSlideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
 }
 
 /* --- Recently played scroll entrance --- */
