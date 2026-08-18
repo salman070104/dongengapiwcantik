@@ -152,12 +152,13 @@ body.theme-dark .menu-item:hover {
 }
 
 body.theme-dark .story-card {
-    background: #1f2937;
-    border-color: rgba(255, 255, 255, 0.06);
+    background: transparent;
+    border-color: transparent;
 }
 
 body.theme-dark .story-card:hover {
-    box-shadow: 0 6px 24px rgba(139, 92, 246, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
 }
 
 html {
@@ -587,29 +588,26 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    padding: 8px 12px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
     cursor: pointer;
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-    border: 1px solid rgba(124, 58, 237, 0.06);
-    will-change: transform;
+    border: none;
 }
 
 .story-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.15);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .story-card:active {
-    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .story-thumb {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--radius-sm);
+    width: 56px;
+    height: 56px;
+    border-radius: 4px;
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -618,11 +616,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.story-card:hover .story-thumb img {
-    transform: scale(1.05);
 }
 
 .story-info {
@@ -631,21 +624,23 @@ body {
 }
 
 .story-name {
-    font-size: 0.9rem;
-    font-weight: 800;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: var(--text-dark);
     margin-bottom: 2px;
     line-height: 1.3;
 }
 
 .story-desc {
-    font-size: 0.75rem;
-    color: var(--text-medium);
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 0.8rem;
+    color: #a7a7a7;
+    font-weight: 400;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin-bottom: 0;
     line-height: 1.4;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -772,13 +767,17 @@ body {
 
 /* Now-playing story card highlight */
 .story-card.now-playing {
-    border-color: var(--primary-purple);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.05));
+    background: transparent;
+    border-color: transparent;
+}
+
+.story-card.now-playing .story-name {
+    color: #1ed760; /* Spotify Green */
 }
 
 body.theme-dark .story-card.now-playing {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.08));
-    border-color: var(--primary-purple);
+    background: transparent;
+    border-color: transparent;
 }
 /* ===== Page System ===== */
 .page {
@@ -2159,4 +2158,99 @@ body.theme-dark .story-card.now-playing {
     body {
         background: var(--bg-light);
     }
+}
+
+/* Story Options Menu (3-dots) */
+.story-options {
+    position: relative;
+    margin-left: auto;
+    z-index: 10;
+}
+
+.story-options-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-medium);
+    transition: background 0.2s;
+}
+
+.story-options-btn:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+body.theme-dark .story-options-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.story-options-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(0,0,0,0.05);
+    min-width: 120px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+body.theme-dark .story-options-menu {
+    border-color: rgba(255,255,255,0.05);
+}
+
+.story-options-menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-dark);
+}
+
+.story-options-menu button:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+body.theme-dark .story-options-menu button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.story-options-menu .story-edit-menu-btn {
+    color: var(--yellow-medium);
+}
+
+.story-options-menu .story-delete-menu-btn {
+    color: #ef4444;
+}
+
+/* Playing Indicator Animation */
+.playing-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-card.now-playing .playing-indicator {
+    display: flex;
+}
+
+.playing-indicator .icon-equalizer {
+    animation: equalizerPulse 1s ease-in-out infinite alternate;
 }
