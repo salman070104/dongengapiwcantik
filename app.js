@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initProfilUI();
     updateProfilStats();
     initSearch();
-    initCategoryChips();
+
     initMiniPlayer();
     initFullPlayer();
     initAddStoryModal();
@@ -981,24 +981,9 @@ function initSearch() {
     input.addEventListener('input', () => {
         clearTimeout(debounce);
         debounce = setTimeout(() => {
-            const activeChip = document.querySelector('.chip.active');
-            const category = activeChip?.dataset.category || 'semua';
+            const category = 'semua';
             renderStoryGrid(category, input.value);
         }, 250);
-    });
-}
-
-// ===== Category Chips =====
-function initCategoryChips() {
-    const chips = document.querySelectorAll('.chip');
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            chips.forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            const searchInput = document.getElementById('search-input');
-            renderStoryGrid(chip.dataset.category, searchInput?.value || '');
-            if (navigator.vibrate) navigator.vibrate(10);
-        });
     });
 }
 
