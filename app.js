@@ -565,36 +565,42 @@ function updateMediaSession(story) {
 
 // ===== Star Generation =====
 function initStars() {
-    const container = document.getElementById('stars-container');
-    if (!container) return;
-
-    for (let i = 0; i < 30; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
-        star.style.setProperty('--delay', `${Math.random() * 3}s`);
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 70}%`;
-        const size = 1.5 + Math.random() * 2.5;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        container.appendChild(star);
-    }
-
-    const starPositions = [
-        { x: 75, y: 8, size: 16 }, { x: 88, y: 20, size: 12 },
-        { x: 15, y: 55, size: 10 }, { x: 60, y: 15, size: 14 },
-        { x: 92, y: 45, size: 11 }, { x: 5, y: 30, size: 9 },
+    const containers = [
+        document.getElementById('stars-container'),
+        document.getElementById('page-stars-container')
     ];
-    starPositions.forEach(pos => {
-        const starSvg = document.createElement('div');
-        starSvg.className = 'star-svg';
-        starSvg.style.setProperty('--duration', `${3 + Math.random() * 3}s`);
-        starSvg.style.setProperty('--delay', `${Math.random() * 2}s`);
-        starSvg.style.left = `${pos.x}%`;
-        starSvg.style.top = `${pos.y}%`;
-        starSvg.innerHTML = `<svg viewBox="0 0 24 24" width="${pos.size}" height="${pos.size}" fill="#FFE066"><path d="M12 2l2.4 7.2H22l-6 4.5 2.3 7.3L12 16.5 5.7 21l2.3-7.3-6-4.5h7.6z"/></svg>`;
-        container.appendChild(starSvg);
+
+    containers.forEach(container => {
+        if (!container) return;
+
+        for (let i = 0; i < 30; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
+            star.style.setProperty('--delay', `${Math.random() * 3}s`);
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            const size = 1.5 + Math.random() * 2.5;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            container.appendChild(star);
+        }
+
+        const starPositions = [
+            { x: 75, y: 8, size: 16 }, { x: 88, y: 20, size: 12 },
+            { x: 15, y: 55, size: 10 }, { x: 60, y: 15, size: 14 },
+            { x: 92, y: 45, size: 11 }, { x: 5, y: 30, size: 9 },
+        ];
+        starPositions.forEach(pos => {
+            const starSvg = document.createElement('div');
+            starSvg.className = 'star-svg';
+            starSvg.style.setProperty('--duration', `${3 + Math.random() * 3}s`);
+            starSvg.style.setProperty('--delay', `${Math.random() * 2}s`);
+            starSvg.style.left = `${pos.x}%`;
+            starSvg.style.top = `${Math.random() * 100}%`; // Randomize Y for global
+            starSvg.innerHTML = `<svg viewBox="0 0 24 24" width="${pos.size}" height="${pos.size}" fill="#FFE066"><path d="M12 2l2.4 7.2H22l-6 4.5 2.3 7.3L12 16.5 5.7 21l2.3-7.3-6-4.5h7.6z"/></svg>`;
+            container.appendChild(starSvg);
+        });
     });
 }
 
